@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dynamic Animations</title>
+  <style>
+    .animated-element {
+      width: 100px;
+      height: 100px;
+      background-color: lightcoral;
+      opacity: 0;
+      transition: opacity 1s ease-in-out; /* Smooth fade-in/out */
+    }
+
+    .fade-in {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="animatedDiv" class="animated-element"></div>
+  <button id="triggerButton">Fade In</button>
+
+  <script>
+    const animatedDiv = document.getElementById('animatedDiv');
+    const triggerButton = document.getElementById('triggerButton');
+
+    function managePreferences(key, value) {
+      // (Same localStorage function as above)
+      if (value === undefined) {
+        try {
+          const storedValue = localStorage.getItem(key);
+          return storedValue ? JSON.parse(storedValue) : null;
+        } catch (error) {
+          console.error("Error retrieving data from localStorage:", error);
+          return null;
+        }
+      } else {
+        try {
+          localStorage.setItem(key, JSON.stringify(value));
+          console.log(`Stored '${key}' with value:`, value);
+        } catch (error) {
+          console.error("Error storing data in localStorage:", error);
+        }
+      }
+    }
+
+    // Check if the user has previously enabled animations
+    const animationsEnabled = managePreferences('animationsEnabled');
+
+    triggerButton.addEventListener('click', () => {
+      if (animationsEnabled === null || animationsEnabled) {
+        // If animations are enabled (or the preference hasn't been set), trigger the animation
+        animatedDiv.classList.add('fade-in');
+        setTimeout(() => {
+          animatedDiv.classList.remove('fade-in'); // Optionally fade out after a delay
+        }, 2000);
+      } else {
+        console.log("Animations are disabled by the user.");
+        // Optionally provide visual feedback that the action occurred but without animation
+        animatedDiv.style.opacity = 1;
+        setTimeout(() => {
+          animatedDiv.style.opacity = 0;
+        }, 100);
+      }
+    });
+
+    // Allow the user to toggle animation preference
+    document.addEventListener('DOMContentLoaded', () => {
+      const toggleButton = document.createElement('button');
+      toggleButton.textContent = animationsEnabled ? 'Disable Animations' : 'Enable Animations';
+      document.body.appendChild(toggleButton);
+
+      toggleButton.addEventListener('click', () => {
+        const newAnimationState = !managePreferences('animationsEnabled');
+        managePreferences('animationsEnabled', newAnimationState);
+        toggleButton.textContent = newAnimationState ? 'Disable Animations' : 'Enable Animations';
+        console.log('Animations enabled:', newAnimationState);
+      });
+    });
+  </script>
+
+</body>
+</html>
